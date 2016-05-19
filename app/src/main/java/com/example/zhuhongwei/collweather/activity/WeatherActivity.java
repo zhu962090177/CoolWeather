@@ -1,6 +1,7 @@
 package com.example.zhuhongwei.collweather.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -40,8 +41,8 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         temp1Text = (TextView)findViewById(R.id.temp1);
         temp2Text = (TextView)findViewById(R.id.temp2);
         currentDateText = (TextView)findViewById(R.id.current_date);
-        //swithCity = (Button)findViewById(R.id.switch_city);
-        //refreshWeather = (Button)findViewById(R.id.refresh_weather);
+        swithCity = (Button)findViewById(R.id.switch_city);
+        refreshWeather = (Button)findViewById(R.id.refresh_weather);
         String countyCode = getIntent().getStringExtra("county_code");
         if (!TextUtils.isEmpty(countyCode)){
             publishText.setText("同步中...");
@@ -51,13 +52,30 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         }else {
             showWeather();
         }
-        //swithCity.setOnClickListener(this);
-        //refreshWeather.setOnClickListener(this);
+        swithCity.setOnClickListener(this);
+        refreshWeather.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()){
+            case R.id.switch_city:
+                Intent intent = new Intent(this,ChooseAreaActivity.class);
+                intent.putExtra("from_weather_activity", true);
+                startActivity(intent);
+                finish();
+                break;
+            case R.id.refresh_weather:
+                publishText.setText("同步中...");
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                String weatherCode = preferences.getString("weather_code","");
+                if (!TextUtils.isEmpty(weatherCode)){
+                    queryWeatherInfo(weatherCode);
+                }
+                break;
+            default:
+                break;
+        }
     }
     private void queryWeatherCode(String countyCode){
         String address = "http://www.weather.com.cn/data/list3/city" + countyCode + ".xml";

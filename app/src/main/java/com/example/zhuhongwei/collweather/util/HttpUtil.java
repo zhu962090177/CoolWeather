@@ -1,5 +1,8 @@
 package com.example.zhuhongwei.collweather.util;
 
+import android.os.Build;
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,10 +24,14 @@ public class HttpUtil {
                 HttpURLConnection connection = null;
                 try {
                     URL url = new URL(address);
+                    Log.i("zhuhongwei---->url",url.toString());
                     connection = (HttpURLConnection)url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setConnectTimeout(8000);
                     connection.setReadTimeout(8000);
+                    if (Build.VERSION.SDK != null && Build.VERSION.SDK_INT > 13) {
+                        connection.setRequestProperty("Connection", "close");
+                    }
                     InputStream in = connection.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     StringBuilder response = new StringBuilder();
@@ -32,6 +39,7 @@ public class HttpUtil {
                     while ((line = reader.readLine()) != null){
                         response.append(line);
                     }
+                    Log.i("zhuhongwei---->",response.toString());
                     if (listener != null){
                         listener.onFinish(response.toString());
                     }
@@ -44,6 +52,7 @@ public class HttpUtil {
                     if (connection != null){
                         connection.disconnect();
                     }
+
                 }
             }
         }).start();
